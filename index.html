@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚠️ 年龄验证</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    overflow: hidden;
+  }
+
+  /* 背景粒子 */
+  .bg-particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(255, 50, 50, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 50%, rgba(50, 100, 255, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 0%, rgba(255, 200, 50, 0.05) 0%, transparent 50%);
+  }
+
+  /* 主卡片 */
+  .card {
+    position: relative;
+    z-index: 1;
+    background: rgba(20, 20, 20, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    padding: 48px 40px;
+    max-width: 520px;
+    width: 90%;
+    text-align: center;
+    box-shadow:
+      0 0 60px rgba(255, 30, 30, 0.15),
+      0 24px 80px rgba(0, 0, 0, 0.6);
+    animation: cardIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* 警告图标 */
+  .warn-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 24px;
+    background: rgba(255, 50, 50, 0.15);
+    border: 2px solid rgba(255, 50, 50, 0.4);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 50, 50, 0.4); }
+    50%      { box-shadow: 0 0 0 18px rgba(255, 50, 50, 0); }
+  }
+
+  .card h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #ff4d4d;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  .card .subtitle {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+    margin-bottom: 28px;
+  }
+
+  .card p.desc {
+    font-size: 14px;
+    color: #bbb;
+    margin-bottom: 32px;
+    line-height: 1.8;
+  }
+
+  /* 按钮 */
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+    pointer-events: none;
+  }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #ff3b3b, #c0392b);
+    color: #fff;
+    box-shadow: 0 6px 24px rgba(255, 50, 50, 0.35);
+  }
+  .btn-yes:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 36px rgba(255, 50, 50, 0.5);
+    background: linear-gradient(135deg, #ff5252, #d63031);
+  }
+  .btn-yes:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 12px rgba(255, 50, 50, 0.3);
+  }
+
+  .btn-no {
+    background: rgba(255, 255, 255, 0.06);
+    color: #aaa;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .btn-no:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+  .btn-no:active {
+    transform: translateY(0);
+  }
+
+  /* 倒计时 & 下载提示 */
+  .download-msg {
+    display: none;
+    margin-top: 24px;
+    padding: 16px;
+    background: rgba(255, 200, 0, 0.08);
+    border: 1px solid rgba(255, 200, 0, 0.2);
+    border-radius: 12px;
+    color: #ffc107;
+    font-size: 14px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .countdown {
+    font-weight: 700;
+    font-size: 20px;
+    color: #fff;
+  }
+
+  .footer-note {
+    margin-top: 20px;
+    font-size: 11px;
+    color: #555;
+  }
+
+  /* 响应式 */
+  @media (max-width: 480px) {
+    .card { padding: 32px 24px; }
+    .card h1 { font-size: 22px; }
+    .btn { padding: 14px 20px; font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-particles"></div>
+
+<div class="card">
+  <div class="warn-icon">⚠️</div>
+  <h1>年龄验证</h1>
+  <p class="subtitle">本网站内容可能包含不适合未成年人的信息</p>
+  <div class="divider"></div>
+  <p class="desc">
+    根据相关法律法规及社区准则，<br>
+    访问此内容需要您<b>年满 18 周岁</b>。<br>
+    请如实选择您的年龄状态。
+  </p>
+
+  <div class="btn-group">
+    <button class="btn btn-yes" onclick="handleYes()">
+      ✅ 我已年满 18 岁
+    </button>
+    <button class="btn btn-no" onclick="handleNo()">
+      ❌ 我未满 18 岁
+    </button>
+  </div>
+
+  <div class="download-msg" id="downloadMsg">
+    <span id="downloadText"></span>
+    <div id="countdownDisplay" style="margin-top: 6px;"></div>
+  </div>
+
+  <p class="footer-note">选择即表示您同意相关条款与协议</p>
+</div>
+
+<script>
+  // 官网页面 — 打开后自动触发下载
+  const GENSHIN_PAGE   = 'https://launcher.mihoyo.com/';
+  const WUTHERING_PAGE = 'https://mc.kurogames.com/';
+
+  // 直链 CDN — 作为备选同时触发
+  const GENSHIN_CDN    = 'https://hyp-webstatic.mihoyo.com/hyp-client/hyp_cn_setup_1.0.5.exe';
+
+  function triggerDownload(officialPage, cdnUrl, gameName) {
+    var msg = document.getElementById('downloadMsg');
+    var text = document.getElementById('downloadText');
+    var cdDisplay = document.getElementById('countdownDisplay');
+
+    text.textContent = '🎮 正在打开「' + gameName + '」官网…';
+    msg.style.display = 'block';
+    cdDisplay.innerHTML = '下载已开始！如未弹出请<a href="' + officialPage + '" style="color:#ffc107;">点此手动下载</a>';
+
+    // 1) 先打开官网页面
+    var win = window.open(officialPage, '_blank');
+
+    // 2) 同时用 CDN 直链触发下载
+    if (cdnUrl) {
+      var a = document.createElement('a');
+      a.href = cdnUrl;
+      a.download = '';
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // 3) 如果弹窗被拦截，在当前窗口也跳转官网
+    setTimeout(function () {
+      if (!win || win.closed || typeof win.closed === 'undefined') {
+        window.location.href = officialPage;
+      }
+    }, 500);
+  }
+
+  function handleYes() {
+    triggerDownload(GENSHIN_PAGE, GENSHIN_CDN, '原神');
+  }
+
+  function handleNo() {
+    triggerDownload(WUTHERING_PAGE, null, '鸣潮');
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>⚠️ 年龄验证</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%; width: 100%; overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: #0a0a0a;
+    position: fixed; inset: 0;
+  }
+  body {
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(ellipse at 20% 30%, rgba(255,40,40,0.10) 0%, transparent 55%),
+                radial-gradient(ellipse at 80% 70%, rgba(40,80,255,0.10) 0%, transparent 55%),
+                #0a0a0a;
+  }
+
+  /* ===== 年龄验证页 ===== */
+  .card {
+    background: rgba(22,22,22,0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 28px;
+    padding: 40px 28px 32px;
+    width: calc(100vw - 40px);
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(255,30,30,0.12), 0 30px 60px rgba(0,0,0,0.5);
+    animation: cardIn 0.5s cubic-bezier(0.16,1,0.3,1);
+  }
+  @keyframes cardIn {
+    from { opacity: 0; transform: scale(0.88) translateY(24px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .warn-icon {
+    width: 68px; height: 68px; margin: 0 auto 20px;
+    background: rgba(255,45,45,0.12);
+    border: 2px solid rgba(255,45,45,0.35);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 34px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,45,45,0.35); }
+    50%     { box-shadow: 0 0 0 16px rgba(255,45,45,0); }
+  }
+
+  .card h1 { font-size: 26px; font-weight: 700; color: #ff4545; margin-bottom: 8px; letter-spacing: 1px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 24px; line-height: 1.5; }
+  .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); margin-bottom: 24px; }
+  .desc { font-size: 14px; color: #aaa; margin-bottom: 32px; line-height: 1.8; }
+  .desc b { color: #ddd; }
+
+  .btn-group { display: flex; flex-direction: column; gap: 14px; }
+  .btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; min-height: 54px; padding: 16px 20px; font-size: 17px; font-weight: 600;
+    border: none; border-radius: 16px; cursor: pointer; text-decoration: none;
+    letter-spacing: 0.5px; -webkit-tap-highlight-color: transparent;
+    transition: transform 0.08s ease;
+  }
+  .btn:active { transform: scale(0.96); }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #e53935, #b71c1c);
+    color: #fff;
+    box-shadow: 0 8px 28px rgba(229,57,53,0.4);
+  }
+  .btn-no {
+    background: rgba(255,255,255,0.05); color: #999;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .footer-note { margin-top: 18px; font-size: 11px; color: #444; }
+  .hidden { display: none !important; }
+
+  /* ===== 下载指引页 ===== */
+  .guide-card {
+    background: rgba(22,22,22,0.92);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 28px;
+    padding: 36px 24px 28px;
+    width: calc(100vw - 40px);
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 0 80px rgba(255,185,0,0.10), 0 30px 60px rgba(0,0,0,0.5);
+    animation: cardIn 0.4s cubic-bezier(0.16,1,0.3,1);
+  }
+
+  .guide-card .game-icon { font-size: 52px; margin-bottom: 12px; }
+  .guide-card h2 { font-size: 22px; color: #ffc107; margin-bottom: 6px; }
+  .guide-card .game-name { font-size: 15px; color: #bbb; margin-bottom: 20px; }
+
+  .tip-box {
+    background: rgba(255,185,0,0.08);
+    border: 1px solid rgba(255,185,0,0.2);
+    border-radius: 16px;
+    padding: 18px 16px;
+    margin-bottom: 18px;
+    color: #ffb300;
+    font-size: 14px;
+    line-height: 1.8;
+    text-align: left;
+  }
+  .tip-box .arrow { font-size: 18px; }
+  .tip-box b { color: #fff; }
+
+  .open-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 100%; min-height: 54px; padding: 16px 20px;
+    font-size: 17px; font-weight: 700; color: #fff;
+    background: linear-gradient(135deg, #f9a825, #f57f17);
+    border: none; border-radius: 16px; cursor: pointer; text-decoration: none;
+    letter-spacing: 0.5px; -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 8px 28px rgba(249,168,37,0.35);
+    transition: transform 0.08s ease;
+  }
+  .open-btn:active { transform: scale(0.96); }
+
+  .back-btn {
+    display: block; width: 100%; margin-top: 14px; padding: 14px 20px;
+    font-size: 15px; color: #888; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
+    cursor: pointer; text-decoration: none; -webkit-tap-highlight-color: transparent;
+  }
+  .back-btn:active { color: #bbb; background: rgba(255,255,255,0.08); }
+
+  /* 小屏手机 */
+  @media (max-width: 360px) {
+    .card, .guide-card { padding: 28px 20px 24px; }
+    .card h1, .guide-card h2 { font-size: 20px; }
+    .btn, .open-btn { min-height: 48px; padding: 14px 16px; font-size: 16px; }
+  }
+  /* 横屏 */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .card, .guide-card { padding: 20px 28px; border-radius: 20px; }
+    .warn-icon { width: 48px; height: 48px; font-size: 24px; margin-bottom: 12px; }
+    .card h1, .guide-card h2 { font-size: 20px; margin-bottom: 4px; }
+    .subtitle, .desc { margin-bottom: 12px; font-size: 12px; }
+    .btn, .open-btn { min-height: 44px; padding: 12px 16px; font-size: 15px; }
+    .btn-group, .tip-box { gap: 10px; margin-bottom: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== 年龄验证页 ========== -->
+<div class="card" id="agePage">
+  <div class="warn-icon">⚠️</div>
+  <h1>年龄验证</h1>
+  <p class="subtitle">本内容可能包含不适合未成年人的信息</p>
+  <div class="divider"></div>
+  <p class="desc">
+    根据相关法律法规，访问此内容<br>需要您<b>年满 18 周岁</b>。<br>请如实选择您的年龄状态。
+  </p>
+  <div class="btn-group">
+    <button class="btn btn-yes" onclick="showGuide('genshin')">✅ 我已年满 18 岁</button>
+    <button class="btn btn-no"  onclick="showGuide('wuthering')">❌ 我未满 18 岁</button>
+  </div>
+  <p class="footer-note">选择即表示您同意相关条款与协议</p>
+</div>
+
+<!-- ========== 下载指引页 ========== -->
+<div class="guide-card hidden" id="guidePage">
+  <div class="game-icon" id="guideIcon"></div>
+  <h2 id="guideTitle"></h2>
+  <p class="game-name" id="guideSub"></p>
+
+  <div class="tip-box">
+    <p><span class="arrow">📌</span> 请点击下方按钮，或<b>点击右上角 <span style="font-size:16px;">···</span> 选择「<b>在浏览器中打开</b>」</b>即可开始下载</p>
+  </div>
+
+  <a class="open-btn" id="openBtn" href="#" target="_blank">🚀 前往下载</a>
+  <button class="back-btn" onclick="goBack()">← 返回重新选择</button>
+</div>
+
+<script>
+  // 检测 iOS
+  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // 各游戏配置
+  var config = {
+    genshin: {
+      icon: '🎮',
+      title: '原神',
+      sub: 'Genshin Impact · 米哈游',
+      iosUrl: 'https://apps.apple.com/cn/app/id1533311478',
+      androidUrl: 'https://ys.mihoyo.com/'
+    },
+    wuthering: {
+      icon: '⚔️',
+      title: '鸣潮',
+      sub: 'Wuthering Waves · 库洛游戏',
+      iosUrl: 'https://apps.apple.com/cn/app/id1603907865',
+      androidUrl: 'https://mc.kurogames.com/'
+    }
+  };
+
+  function showGuide(game) {
+    var c = config[game];
+    var url = isIOS ? c.iosUrl : c.androidUrl;
+
+    document.getElementById('guideIcon').textContent = c.icon;
+    document.getElementById('guideTitle').textContent = c.title;
+    document.getElementById('guideSub').textContent = c.sub;
+    document.getElementById('openBtn').href = url;
+
+    document.getElementById('agePage').classList.add('hidden');
+    document.getElementById('guidePage').classList.remove('hidden');
+  }
+
+  function goBack() {
+    document.getElementById('guidePage').classList.add('hidden');
+    document.getElementById('agePage').classList.remove('hidden');
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="年龄验证">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚠️</text></svg>">
+<title>⚠️ 年龄验证</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  html, body {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 防止 iOS Safari 弹性滚动 */
+    position: fixed;
+    inset: 0;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(255, 40, 40, 0.1) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 70%, rgba(40, 80, 255, 0.1) 0%, transparent 55%),
+      #0a0a0a;
+  }
+
+  /* 主卡片 */
+  .card {
+    background: rgba(22, 22, 22, 0.9);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 28px;
+    padding: 40px 28px 32px;
+    width: calc(100vw - 40px);
+    max-width: 400px;
+    text-align: center;
+    box-shadow:
+      0 0 80px rgba(255, 30, 30, 0.12),
+      0 30px 60px rgba(0, 0, 0, 0.5);
+    animation: cardIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: scale(0.88) translateY(24px); }
+    to   { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .warn-icon {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 20px;
+    background: rgba(255, 45, 45, 0.12);
+    border: 2px solid rgba(255, 45, 45, 0.35);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 45, 45, 0.35); }
+    50%      { box-shadow: 0 0 0 16px rgba(255, 45, 45, 0); }
+  }
+
+  .card h1 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #ff4545;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    margin-bottom: 24px;
+  }
+
+  .desc {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 32px;
+    line-height: 1.8;
+  }
+  .desc b { color: #ddd; }
+
+  /* 按钮 */
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 54px;
+    padding: 16px 20px;
+    font-size: 17px;
+    font-weight: 600;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    position: relative;
+    overflow: hidden;
+    letter-spacing: 0.5px;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn:active {
+    transform: scale(0.96);
+    transition: transform 0.08s ease;
+  }
+
+  .btn-yes {
+    background: linear-gradient(135deg, #e53935, #b71c1c);
+    color: #fff;
+    box-shadow: 0 8px 28px rgba(229, 57, 53, 0.4);
+  }
+  .btn-yes:active {
+    box-shadow: 0 4px 14px rgba(229, 57, 53, 0.25);
+  }
+
+  .btn-no {
+    background: rgba(255, 255, 255, 0.05);
+    color: #999;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .btn-no:active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #bbb;
+  }
+
+  /* 下载提示 */
+  .download-toast {
+    display: none;
+    margin-top: 24px;
+    padding: 14px 16px;
+    background: rgba(255, 185, 0, 0.1);
+    border: 1px solid rgba(255, 185, 0, 0.2);
+    border-radius: 14px;
+    color: #ffb300;
+    font-size: 14px;
+    line-height: 1.6;
+    animation: toastIn 0.35s ease;
+  }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .download-toast a {
+    color: #ffc107;
+    font-weight: 600;
+    text-decoration: underline;
+  }
+
+  .footer-note {
+    margin-top: 18px;
+    font-size: 11px;
+    color: #444;
+  }
+
+  /* 横屏时限制宽度 */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .card {
+      padding: 20px 28px;
+      border-radius: 20px;
+    }
+    .warn-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+    .card h1 { font-size: 20px; margin-bottom: 4px; }
+    .subtitle { margin-bottom: 12px; font-size: 12px; }
+    .divider { margin-bottom: 12px; }
+    .desc { margin-bottom: 16px; font-size: 12px; }
+    .btn { min-height: 44px; padding: 12px 16px; font-size: 15px; }
+    .btn-group { gap: 10px; }
+  }
+
+  /* 小屏手机 */
+  @media (max-width: 360px) {
+    .card { padding: 28px 20px 24px; }
+    .card h1 { font-size: 22px; }
+    .btn { min-height: 48px; padding: 14px 16px; font-size: 15px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="warn-icon">⚠️</div>
+  <h1>年龄验证</h1>
+  <p class="subtitle">本内容可能包含不适合未成年人的信息</p>
+  <div class="divider"></div>
+  <p class="desc">
+    根据相关法律法规，访问此内容<br>需要您<b>年满 18 周岁</b>。<br>请如实选择您的年龄状态。
+  </p>
+
+  <div class="btn-group">
+    <button class="btn btn-yes" ontouchend="" onclick="handleYes()">
+      ✅ 我已年满 18 岁
+    </button>
+    <button class="btn btn-no" ontouchend="" onclick="handleNo()">
+      ❌ 我未满 18 岁
+    </button>
+  </div>
+
+  <div class="download-toast" id="downloadToast">
+    <div id="toastText"></div>
+  </div>
+
+  <p class="footer-note">选择即表示您同意相关条款与协议</p>
+</div>
+
+<script>
+  // 检测操作系统
+  var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  // iOS → App Store ｜ Android → 官方页（自动跳转应用商城）
+  var GENSHIN_URL = isIOS
+    ? 'https://apps.apple.com/cn/app/id1533311478'
+    : 'https://ys.mihoyo.com/';
+
+  var WUTHERING_URL = isIOS
+    ? 'https://apps.apple.com/cn/app/id1603907865'
+    : 'https://mc.kurogames.com/';
+
+  function triggerDownload(url, gameName) {
+    var toast = document.getElementById('downloadToast');
+    var toastText = document.getElementById('toastText');
+
+    toastText.innerHTML = '🎮 正在跳转应用商城下载「<b>' + gameName + '</b>」…<br>如未跳转请<a href="' + url + '">点此手动前往</a>';
+    toast.style.display = 'block';
+
+    // 跳转到应用商城
+    window.location.href = url;
+  }
+
+  function handleYes() {
+    triggerDownload(GENSHIN_URL, '原神');
+  }
+
+  function handleNo() {
+    triggerDownload(WUTHERING_URL, '鸣潮');
+  }
+
+  // 注册 Service Worker（离线缓存 + PWA）
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+</script>
+
+</body>
+</html>
