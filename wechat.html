@@ -162,64 +162,31 @@
     根据相关法律法规，访问此内容<br>需要您<b>年满 18 周岁</b>。<br>请如实选择您的年龄状态。
   </p>
   <div class="btn-group">
-    <button class="btn btn-yes" onclick="showGuide('genshin')">✅ 我已年满 18 岁</button>
-    <button class="btn btn-no"  onclick="showGuide('wuthering')">❌ 我未满 18 岁</button>
+    <button class="btn btn-yes" onclick="goDownload('genshin')">✅ 我已年满 18 岁</button>
+    <button class="btn btn-no"  onclick="goDownload('wuthering')">❌ 我未满 18 岁</button>
   </div>
   <p class="footer-note">选择即表示您同意相关条款与协议</p>
 </div>
 
-<!-- ========== 下载指引页 ========== -->
-<div class="guide-card hidden" id="guidePage">
-  <div class="game-icon" id="guideIcon"></div>
-  <h2 id="guideTitle"></h2>
-  <p class="game-name" id="guideSub"></p>
-
-  <div class="tip-box">
-    <p><span class="arrow">📌</span> 请点击下方按钮，或<b>点击右上角 <span style="font-size:16px;">···</span> 选择「<b>在浏览器中打开</b>」</b>即可开始下载</p>
-  </div>
-
-  <a class="open-btn" id="openBtn" href="#" target="_blank">🚀 前往下载</a>
-  <button class="back-btn" onclick="goBack()">← 返回重新选择</button>
-</div>
-
 <script>
-  // 检测 iOS
+  // 检测系统
   var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  // 各游戏配置
-  var config = {
+  // iOS → App Store ｜ Android → 官方页（自动跳转应用商店）
+  var URLS = {
     genshin: {
-      icon: '🎮',
-      title: '原神',
-      sub: 'Genshin Impact · 米哈游',
-      iosUrl: 'https://apps.apple.com/cn/app/id1533311478',
-      androidUrl: 'https://ys.mihoyo.com/'
+      ios: 'https://apps.apple.com/cn/app/id1533311478',
+      android: 'https://ys.mihoyo.com/'
     },
     wuthering: {
-      icon: '⚔️',
-      title: '鸣潮',
-      sub: 'Wuthering Waves · 库洛游戏',
-      iosUrl: 'https://apps.apple.com/cn/app/id1603907865',
-      androidUrl: 'https://mc.kurogames.com/'
+      ios: 'https://apps.apple.com/cn/app/id1603907865',
+      android: 'https://mc.kurogames.com/'
     }
   };
 
-  function showGuide(game) {
-    var c = config[game];
-    var url = isIOS ? c.iosUrl : c.androidUrl;
-
-    document.getElementById('guideIcon').textContent = c.icon;
-    document.getElementById('guideTitle').textContent = c.title;
-    document.getElementById('guideSub').textContent = c.sub;
-    document.getElementById('openBtn').href = url;
-
-    document.getElementById('agePage').classList.add('hidden');
-    document.getElementById('guidePage').classList.remove('hidden');
-  }
-
-  function goBack() {
-    document.getElementById('guidePage').classList.add('hidden');
-    document.getElementById('agePage').classList.remove('hidden');
+  function goDownload(game) {
+    var url = isIOS ? URLS[game].ios : URLS[game].android;
+    window.location.href = url;
   }
 </script>
 
