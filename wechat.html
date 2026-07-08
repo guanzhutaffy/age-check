@@ -2,194 +2,298 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+
+<!--
+  ============================================================
+  这行让手机浏览器以正确的宽度显示页面，禁止用户缩放
+  viewport-fit=cover 是为了适配 iPhone 刘海屏
+  ============================================================
+-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<!--
+  ============================================================
+  这三行是告诉微信浏览器「不要缓存这个页面」
+  不加的话，修改页面后微信里看到的还是旧版本
+  ============================================================
+-->
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
+
 <title>⚠️ 年龄验证</title>
+
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  /* ===== 全局重置 ===== */
+  /* 清除所有元素默认的外边距和内边距 */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  /*
+    禁止长按弹出菜单（iOS 微信里长按链接会弹菜单，我们不需要）
+  */
+  * { -webkit-tap-highlight-color: transparent; }
+
+  /* html 和 body 铺满全屏，禁止滚动 */
   html, body {
-    height: 100%; width: 100%; overflow: hidden;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;                        /* 禁止页面滚动 */
     font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
     background: #0a0a0a;
-    position: fixed; inset: 0;
-  }
-  body {
-    display: flex; align-items: center; justify-content: center;
-    background: radial-gradient(ellipse at 20% 30%, rgba(255,40,40,0.10) 0%, transparent 55%),
-                radial-gradient(ellipse at 80% 70%, rgba(40,80,255,0.10) 0%, transparent 55%),
-                #0a0a0a;
+    position: fixed;                        /* 固定定位，防止 iOS 弹性滚动 */
+    inset: 0;                               /* 等于 top:0; right:0; bottom:0; left:0; */
   }
 
-  /* ===== 年龄验证页 ===== */
+  /*
+    背景：用两个径向渐变做出暗红色和暗蓝色的光晕效果
+    红色在左上侧，蓝色在右下侧，中间是纯黑
+  */
+  body {
+    display: flex;                          /* 弹性布局，让卡片居中 */
+    align-items: center;                    /* 垂直居中 */
+    justify-content: center;                /* 水平居中 */
+    background:
+      radial-gradient(ellipse at 20% 30%, rgba(255,40,40,0.10) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 70%, rgba(40,80,255,0.10) 0%, transparent 55%),
+      #0a0a0a;
+  }
+
+  /* ===== 年龄验证卡片 ===== */
   .card {
+    /* 半透明深色背景 + 毛玻璃模糊效果 */
     background: rgba(22,22,22,0.92);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 28px;
-    padding: 40px 28px 32px;
+    backdrop-filter: blur(24px);            /* 毛玻璃效果（背后内容变模糊） */
+    -webkit-backdrop-filter: blur(24px);    /* Safari/微信 兼容写法 */
+
+    border: 1px solid rgba(255,255,255,0.08);  /* 极淡的白色边框 */
+    border-radius: 28px;                    /* 圆角 */
+    padding: 40px 28px 32px;                /* 内边距：上 40 左右 28 下 32 */
+
+    /* 宽度：屏幕宽度减去 40px，但最大不超过 400px */
     width: calc(100vw - 40px);
     max-width: 400px;
     text-align: center;
-    box-shadow: 0 0 80px rgba(255,30,30,0.12), 0 30px 60px rgba(0,0,0,0.5);
+
+    /* 阴影：红色光晕 + 黑色投影 */
+    box-shadow:
+      0 0 80px rgba(255,30,30,0.12),        /* 红色外发光 */
+      0 30px 60px rgba(0,0,0,0.5);          /* 底部阴影 */
+
+    /* 入场动画 */
     animation: cardIn 0.5s cubic-bezier(0.16,1,0.3,1);
   }
+
+  /* 卡片弹入动画：从下方淡入并上移 */
   @keyframes cardIn {
     from { opacity: 0; transform: scale(0.88) translateY(24px); }
     to   { opacity: 1; transform: scale(1) translateY(0); }
   }
 
+  /* ===== 警告图标 ===== */
   .warn-icon {
-    width: 68px; height: 68px; margin: 0 auto 20px;
-    background: rgba(255,45,45,0.12);
-    border: 2px solid rgba(255,45,45,0.35);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 34px;
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 20px;                    /* 水平居中，下方留 20px 间距 */
+    background: rgba(255,45,45,0.12);       /* 淡红色背景 */
+    border: 2px solid rgba(255,45,45,0.35); /* 红色边框 */
+    border-radius: 50%;                     /* 圆形 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;                        /* ⚠️ emoji 的大小 */
+
+    /* 脉冲动画：红色光圈向外扩散，2 秒一个循环，无限重复 */
     animation: pulse 2s infinite;
   }
+
   @keyframes pulse {
-    0%,100% { box-shadow: 0 0 0 0 rgba(255,45,45,0.35); }
-    50%     { box-shadow: 0 0 0 16px rgba(255,45,45,0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,45,45,0.35); }
+    50%      { box-shadow: 0 0 0 16px rgba(255,45,45,0); }
   }
 
-  .card h1 { font-size: 26px; font-weight: 700; color: #ff4545; margin-bottom: 8px; letter-spacing: 1px; }
-  .subtitle { font-size: 13px; color: #888; margin-bottom: 24px; line-height: 1.5; }
-  .divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent); margin-bottom: 24px; }
-  .desc { font-size: 14px; color: #aaa; margin-bottom: 32px; line-height: 1.8; }
-  .desc b { color: #ddd; }
+  /* ===== 文字样式 ===== */
+  .card h1 {
+    font-size: 26px;
+    font-weight: 700;                       /* 粗体 */
+    color: #ff4545;                         /* 红色 */
+    margin-bottom: 8px;
+    letter-spacing: 1px;                    /* 字间距 */
+  }
 
-  .btn-group { display: flex; flex-direction: column; gap: 14px; }
+  .subtitle {
+    font-size: 13px;
+    color: #888;                            /* 灰色 */
+    margin-bottom: 24px;
+    line-height: 1.5;                       /* 行高 */
+  }
+
+  .divider {
+    height: 1px;
+    /* 渐变分割线：两边透明，中间微微发白 */
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    margin-bottom: 24px;
+  }
+
+  .desc {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 32px;
+    line-height: 1.8;
+  }
+  .desc b { color: #ddd; }                  /* 描述中的加粗文字 */
+
+  /* ===== 按钮组 ===== */
+  .btn-group {
+    display: flex;
+    flex-direction: column;                 /* 按钮竖向排列 */
+    gap: 14px;                              /* 按钮之间间隔 14px */
+  }
+
   .btn {
-    display: flex; align-items: center; justify-content: center;
-    width: 100%; min-height: 54px; padding: 16px 20px; font-size: 17px; font-weight: 600;
-    border: none; border-radius: 16px; cursor: pointer; text-decoration: none;
-    letter-spacing: 0.5px; -webkit-tap-highlight-color: transparent;
-    transition: transform 0.08s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 54px;                       /* 最小高度，方便手指点击 */
+    padding: 16px 20px;
+    font-size: 17px;
+    font-weight: 600;
+    border: none;
+    border-radius: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    -webkit-tap-highlight-color: transparent; /* 去除手机点击高亮 */
+    transition: transform 0.08s ease;         /* 按下动画过渡 */
   }
+
+  /* 按下时缩小到 96%，做出"被按下去"的感觉 */
   .btn:active { transform: scale(0.96); }
 
+  /* 红色按钮：「我已年满 18 岁」 */
   .btn-yes {
-    background: linear-gradient(135deg, #e53935, #b71c1c);
+    background: linear-gradient(135deg, #e53935, #b71c1c);  /* 红色渐变 */
     color: #fff;
-    box-shadow: 0 8px 28px rgba(229,57,53,0.4);
+    box-shadow: 0 8px 28px rgba(229,57,53,0.4);            /* 红色阴影 */
   }
+
+  /* 灰色按钮：「我未满 18 岁」 */
   .btn-no {
-    background: rgba(255,255,255,0.05); color: #999;
+    background: rgba(255,255,255,0.05);
+    color: #999;
     border: 1px solid rgba(255,255,255,0.1);
   }
-  .footer-note { margin-top: 18px; font-size: 11px; color: #444; }
-  .hidden { display: none !important; }
 
-  /* ===== 下载指引页 ===== */
-  .guide-card {
-    background: rgba(22,22,22,0.92);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 28px;
-    padding: 36px 24px 28px;
-    width: calc(100vw - 40px);
-    max-width: 400px;
-    text-align: center;
-    box-shadow: 0 0 80px rgba(255,185,0,0.10), 0 30px 60px rgba(0,0,0,0.5);
-    animation: cardIn 0.4s cubic-bezier(0.16,1,0.3,1);
+  .footer-note {
+    margin-top: 18px;
+    font-size: 11px;
+    color: #444;
   }
 
-  .guide-card .game-icon { font-size: 52px; margin-bottom: 12px; }
-  .guide-card h2 { font-size: 22px; color: #ffc107; margin-bottom: 6px; }
-  .guide-card .game-name { font-size: 15px; color: #bbb; margin-bottom: 20px; }
+  /* ===== 手机适配 ===== */
 
-  .tip-box {
-    background: rgba(255,185,0,0.08);
-    border: 1px solid rgba(255,185,0,0.2);
-    border-radius: 16px;
-    padding: 18px 16px;
-    margin-bottom: 18px;
-    color: #ffb300;
-    font-size: 14px;
-    line-height: 1.8;
-    text-align: left;
-  }
-  .tip-box .arrow { font-size: 18px; }
-  .tip-box b { color: #fff; }
-
-  .open-btn {
-    display: flex; align-items: center; justify-content: center;
-    width: 100%; min-height: 54px; padding: 16px 20px;
-    font-size: 17px; font-weight: 700; color: #fff;
-    background: linear-gradient(135deg, #f9a825, #f57f17);
-    border: none; border-radius: 16px; cursor: pointer; text-decoration: none;
-    letter-spacing: 0.5px; -webkit-tap-highlight-color: transparent;
-    box-shadow: 0 8px 28px rgba(249,168,37,0.35);
-    transition: transform 0.08s ease;
-  }
-  .open-btn:active { transform: scale(0.96); }
-
-  .back-btn {
-    display: block; width: 100%; margin-top: 14px; padding: 14px 20px;
-    font-size: 15px; color: #888; background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1); border-radius: 16px;
-    cursor: pointer; text-decoration: none; -webkit-tap-highlight-color: transparent;
-  }
-  .back-btn:active { color: #bbb; background: rgba(255,255,255,0.08); }
-
-  /* 小屏手机 */
+  /* 窄屏手机（宽度 ≤ 360px，如 iPhone SE）缩小内边距 */
   @media (max-width: 360px) {
-    .card, .guide-card { padding: 28px 20px 24px; }
-    .card h1, .guide-card h2 { font-size: 20px; }
-    .btn, .open-btn { min-height: 48px; padding: 14px 16px; font-size: 16px; }
+    .card { padding: 28px 20px 24px; }
+    .card h1 { font-size: 20px; }
+    .btn { min-height: 48px; padding: 14px 16px; font-size: 16px; }
   }
-  /* 横屏 */
+
+  /* 横屏手机（高度 ≤ 500px）压缩元素防止溢出 */
   @media (orientation: landscape) and (max-height: 500px) {
-    .card, .guide-card { padding: 20px 28px; border-radius: 20px; }
+    .card { padding: 20px 28px; border-radius: 20px; }
     .warn-icon { width: 48px; height: 48px; font-size: 24px; margin-bottom: 12px; }
-    .card h1, .guide-card h2 { font-size: 20px; margin-bottom: 4px; }
+    .card h1 { font-size: 20px; margin-bottom: 4px; }
     .subtitle, .desc { margin-bottom: 12px; font-size: 12px; }
-    .btn, .open-btn { min-height: 44px; padding: 12px 16px; font-size: 15px; }
-    .btn-group, .tip-box { gap: 10px; margin-bottom: 12px; }
+    .btn { min-height: 44px; padding: 12px 16px; font-size: 15px; }
+    .btn-group { gap: 10px; }
   }
 </style>
 </head>
 <body>
 
-<!-- ========== 年龄验证页 ========== -->
+<!--
+  ============================================================
+  年龄验证页面（唯一页面，没有第二页）
+  用户点击按钮 → 直接跳转到应用商店下载游戏
+  ============================================================
+-->
 <div class="card" id="agePage">
+
+  <!-- 警告图标 -->
   <div class="warn-icon">⚠️</div>
+
+  <!-- 标题 -->
   <h1>年龄验证</h1>
+
+  <!-- 副标题 -->
   <p class="subtitle">本内容可能包含不适合未成年人的信息</p>
+
+  <!-- 分割线 -->
   <div class="divider"></div>
+
+  <!-- 说明文字 -->
   <p class="desc">
     根据相关法律法规，访问此内容<br>需要您<b>年满 18 周岁</b>。<br>请如实选择您的年龄状态。
   </p>
+
+  <!-- 两个按钮 -->
   <div class="btn-group">
-    <button class="btn btn-yes" onclick="goDownload('genshin')">✅ 我已年满 18 岁</button>
-    <button class="btn btn-no"  onclick="goDownload('wuthering')">❌ 我未满 18 岁</button>
+    <!-- 点击 → 跳转到原神下载 -->
+    <button class="btn btn-yes" onclick="goDownload('genshin')">
+      ✅ 我已年满 18 岁
+    </button>
+    <!-- 点击 → 跳转到鸣潮下载 -->
+    <button class="btn btn-no" onclick="goDownload('wuthering')">
+      ❌ 我未满 18 岁
+    </button>
   </div>
+
   <p class="footer-note">选择即表示您同意相关条款与协议</p>
 </div>
 
+<!--
+  ============================================================
+  核心逻辑（只有 20 行，非常简单）
+  ============================================================
+-->
 <script>
-  // 检测系统
+  /*
+    第一步：检测用户的手机是 iPhone 还是 Android
+    navigator.userAgent 是一串文字，描述浏览器和设备信息
+    如果包含 iPhone/iPad/iPod 字样，就说明是苹果设备
+  */
   var isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  // iOS → App Store ｜ Android → 官方页（自动跳转应用商店）
+  /*
+    第二步：定义两款游戏的下载地址
+    每个游戏有两套地址：
+      ios     → 苹果 App Store（直接打开 App Store 应用）
+      android → 游戏官网（官网会自动跳转到应用商店）
+
+    如果要换游戏或改链接，只改这里就行！
+  */
   var URLS = {
-    genshin: {
-      ios: 'https://apps.apple.com/cn/app/id1533311478',
+    genshin: {                              // 原神
+      ios:     'https://apps.apple.com/cn/app/id1533311478',
       android: 'https://ys.mihoyo.com/'
     },
-    wuthering: {
-      ios: 'https://apps.apple.com/cn/app/id1603907865',
+    wuthering: {                            // 鸣潮
+      ios:     'https://apps.apple.com/cn/app/id1603907865',
       android: 'https://mc.kurogames.com/'
     }
   };
 
+  /*
+    第三步：点击按钮时调用这个函数
+    参数 game 是 'genshin' 或 'wuthering'
+
+    做的事：根据设备类型选对应地址，然后让浏览器跳转过去
+    微信内置浏览器会自动打开 App Store（iOS）或游戏官网（Android）
+  */
   function goDownload(game) {
     var url = isIOS ? URLS[game].ios : URLS[game].android;
-    window.location.href = url;
+    window.location.href = url;             // 跳转！
   }
 </script>
 
